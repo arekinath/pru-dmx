@@ -1,0 +1,5 @@
+*.fw
+*.obj
+*.map
+*.lst
+dmxctl
