@@ -20,15 +20,11 @@
 volatile register uint32_t __R30;
 volatile register uint32_t __R31;
 
-//#define	USEC	200
-//#define	MSEC	200000
 #define USEC	200U
 #define	MSEC	200000U
 
 #pragma DATA_SECTION(srdata, ".shared")
 volatile struct shared_ram srdata;
-#pragma DATA_SECTION(testbuf, ".shared")
-volatile uint8_t testbuf[16];
 
 static void
 setup_iep_timer(void)
@@ -109,7 +105,7 @@ main(void)
 {
 	volatile uint32_t *gpio0 = (void *)GPIO0;
 	volatile struct shared_ram *sr = &srdata;
-	uint8_t usel;
+	uint8_t usel = 0xFF;
 	uint32_t i;
 	volatile struct dmx_universe *u;
 
@@ -137,7 +133,8 @@ main(void)
 			sr->sr_pru_flags |= PRU_RUNNING;
 		}
 
-		CT_IEP.TMR_CMP0 = sr->sr_frame_intvl;
+		CT_IEP.TMR_CMP0 = sr->sr_frame_intvl <<
+		    ((sr->sr_usel == usel) ? 2 : 0);
 		CT_IEP.TMR_GLB_CFG_bit.CNT_EN = 1;
 
 		usel = sr->sr_usel;
@@ -167,11 +164,9 @@ main(void)
 
 		await_iep_timer();
 	}
-
-	__halt();
 }
 
-/*struct my_resource_table {
+struct my_resource_table {
 	struct resource_table base;
 	uint32_t offset[1];
 };
@@ -186,4 +181,4 @@ struct my_resource_table pru_remoteproc_ResourceTable = {
 	.offset = {
 		0,
 	},
-};*/
+};

@@ -90,7 +90,7 @@ main(int argc, char *argv[])
 	__sync_synchronize();
 	
 	sr->sr_usel = usel;
-	sr->sr_frame_intvl = 25*MSEC;	/* 25ms / 40fps */
+	sr->sr_frame_intvl = 10*MSEC;	/* 10ms / 100fps */
 
 	if (setup) {
 		__sync_synchronize();
@@ -103,9 +103,9 @@ main(int argc, char *argv[])
 	//print_sr(sr);
 
 	while (1) {
-		for (v = 0; v < 255; v += 5) {
+		for (v = 0; v < 255; v += 1) {
 			while (sr->sr_uactive != sr->sr_usel) {
-				usleep(100);
+				usleep(50);
 				__sync_synchronize();
 			}
 
@@ -119,16 +119,18 @@ main(int argc, char *argv[])
 
 			u->u_size = 48;
 			u->u_start = 0;
-			for (i = 0; i < 48; i += 2)
-				u->u_slot[i] = v;
+			for (i = 0; i < 48; ++i)
+				u->u_slot[i] = (i & 1) ? v : 0;
 			__sync_synchronize();
 
 			sr->sr_usel = usel;
 			__sync_synchronize();
+
+			usleep(1000);
 		}
-		for (v = 255; v > 0; v -= 5) {
+		for (v = 255; v > 0; v -= 1) {
 			while (sr->sr_uactive != sr->sr_usel) {
-				usleep(100);
+				usleep(50);
 				__sync_synchronize();
 			}
 
@@ -142,16 +144,18 @@ main(int argc, char *argv[])
 
 			u->u_size = 48;
 			u->u_start = 0;
-			for (i = 0; i < 48; i+=2)
-				u->u_slot[i] = v;
+			for (i = 0; i < 48; ++i)
+				u->u_slot[i] = (i & 1) ? v : 0;
 			__sync_synchronize();
 
 			sr->sr_usel = usel;
 			__sync_synchronize();
+
+			usleep(1000);
 		}
-		for (v = 0; v < 255; v += 5) {
+		for (v = 0; v < 255; v += 1) {
 			while (sr->sr_uactive != sr->sr_usel) {
-				usleep(100);
+				usleep(50);
 				__sync_synchronize();
 			}
 
@@ -165,16 +169,18 @@ main(int argc, char *argv[])
 
 			u->u_size = 48;
 			u->u_start = 0;
-			for (i = 1; i < 48; i += 2)
-				u->u_slot[i] = v;
+			for (i = 1; i < 48; ++i)
+				u->u_slot[i] = (i & 1) ? 0 : v;
 			__sync_synchronize();
 
 			sr->sr_usel = usel;
 			__sync_synchronize();
+
+			usleep(1000);
 		}
-		for (v = 255; v > 0; v -= 5) {
+		for (v = 255; v > 0; v -= 1) {
 			while (sr->sr_uactive != sr->sr_usel) {
-				usleep(100);
+				usleep(50);
 				__sync_synchronize();
 			}
 
@@ -188,12 +194,14 @@ main(int argc, char *argv[])
 
 			u->u_size = 48;
 			u->u_start = 0;
-			for (i = 1; i < 48; i+=2)
-				u->u_slot[i] = v;
+			for (i = 1; i < 48; ++i)
+				u->u_slot[i] = (i & 1) ? 0 : v;
 			__sync_synchronize();
 
 			sr->sr_usel = usel;
 			__sync_synchronize();
+
+			usleep(1000);
 		}
 	}
 
